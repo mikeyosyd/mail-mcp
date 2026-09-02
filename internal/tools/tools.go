@@ -22,4 +22,8 @@ func RegisterAll(srv *mcp.Server) {
 	RegisterReplaceOutgoingMessage(srv)
 	RegisterDeleteOutgoingMessage(srv)
 	RegisterDeleteDraft(srv)
+
+	// Bulk message management tools
+	RegisterMoveMessages(srv)
+	RegisterDeleteMessages(srv)
 }

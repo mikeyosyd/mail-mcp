@@ -124,6 +124,8 @@ type ToolCmd struct {
 	ReplaceOutgoingMessage ReplaceOutgoingMessageCmd `command:"replace_outgoing_message" description:"Replaces an existing outgoing message"`
 	DeleteOutgoingMessage  DeleteOutgoingMessageCmd  `command:"delete_outgoing_message" description:"Deletes an outgoing message"`
 	FindMessages           FindMessagesCmd           `command:"find_messages" description:"Find messages in a mailbox"`
+	MoveMessages           MoveMessagesCmd           `command:"move_messages" description:"Moves messages by ID to another mailbox"`
+	DeleteMessages         DeleteMessagesCmd         `command:"delete_messages" description:"Deletes messages by ID (moves to Trash)"`
 }
 
 // ListAccountsCmd represents the 'tool list_accounts' command
@@ -339,4 +341,32 @@ func Parse() (*flags.Parser, error) {
 	}
 
 	return parser, nil
+}
+
+// MoveMessagesCmd represents the 'tool move_messages' command
+type MoveMessagesCmd struct {
+	tools.MoveMessagesInput
+	Handler func(tools.MoveMessagesInput) error
+}
+
+// Execute runs the move_messages tool command
+func (c *MoveMessagesCmd) Execute(args []string) error {
+	if c.Handler != nil {
+		return c.Handler(c.MoveMessagesInput)
+	}
+	return nil
+}
+
+// DeleteMessagesCmd represents the 'tool delete_messages' command
+type DeleteMessagesCmd struct {
+	tools.DeleteMessagesInput
+	Handler func(tools.DeleteMessagesInput) error
+}
+
+// Execute runs the delete_messages tool command
+func (c *DeleteMessagesCmd) Execute(args []string) error {
+	if c.Handler != nil {
+		return c.Handler(c.DeleteMessagesInput)
+	}
+	return nil
 }
