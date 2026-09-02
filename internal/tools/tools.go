@@ -29,4 +29,7 @@ func RegisterAll(srv *mcp.Server) {
 
 	// Attachment tools
 	RegisterSaveAttachment(srv)
+
+	// Mailbox management tools
+	RegisterCreateMailbox(srv)
 }

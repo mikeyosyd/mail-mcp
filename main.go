@@ -299,6 +299,11 @@ func registerToolHandlers() {
 		return handleResult(data, err)
 	}
 
+	opts.GlobalOpts.Tool.CreateMailbox.Handler = func(input tools.CreateMailboxInput) error {
+		_, data, err := tools.HandleCreateMailbox(context.Background(), nil, input)
+		return handleResult(data, err)
+	}
+
 	opts.GlobalOpts.Tool.CreateOutgoingMessage.Handler = func(input tools.CreateOutgoingMessageInput) error {
 		_, data, err := tools.HandleCreateOutgoingMessage(context.Background(), nil, input)
 		return handleResult(data, err)
