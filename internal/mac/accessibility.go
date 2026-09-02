@@ -184,17 +184,7 @@ func EnsureAccessibility() error {
 		executable = "mail-mcp"
 	}
 	executableName := filepath.Base(executable)
-	return fmt.Errorf(`accessibility permission is required. Please follow these steps:
-1. In System Settings > Privacy & Security > Accessibility, find '%s' and ensure it's enabled.
-2. If it is already enabled but failing, the binary was likely updated. You must remove the stale entry.
-3. Run the tool again to trigger a new macOS permission prompt.
-4. IMPORTANT: After granting permission, you MUST restart the service.
-
-If you are running the service via Homebrew, execute this command:
-brew services restart %s
-
-Otherwise, execute this command:
-%s launchd restart`, executableName, executableName, executableName)
+	return fmt.Errorf("%s", AccessibilityAdvice(executableName, ParentApp()))
 }
 
 // GetMailPID returns the PID of Mail.app.

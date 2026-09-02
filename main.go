@@ -12,6 +12,7 @@ import (
 	"github.com/dastrobu/mail-mcp/internal/completion"
 	"github.com/dastrobu/mail-mcp/internal/launchd"
 	applog "github.com/dastrobu/mail-mcp/internal/log"
+	"github.com/dastrobu/mail-mcp/internal/mac"
 	"github.com/dastrobu/mail-mcp/internal/opts"
 
 	"github.com/dastrobu/mail-mcp/internal/tools"
@@ -157,6 +158,10 @@ func run(options *opts.RunCmd) error {
 	switch transport {
 	case "stdio":
 		log.Println("Using STDIO transport")
+		if parent := mac.ParentAppName(); parent != "" {
+			mac.SetParentApp(parent)
+			log.Printf("Started by: %s (Accessibility and Automation prompts will name this application)", parent)
+		}
 		log.Println("⚠️  WARNING: STDIO transport requires high permissions and grants automation access to the parent process (Terminal, Claude Desktop, etc.)")
 		log.Println("⚠️  It is strongly recommended to use launchd instead: mail-mcp launchd create")
 		log.Printf("⚠️  If STDIO is required for testing, consider running 'tccutil reset AppleEvents %s' afterwards\n", os.Args[0])
