@@ -141,6 +141,7 @@ function run(argv) {
     // Instead, we fetch property arrays once and filter in JavaScript.
     // This is significantly faster for 10k+ messages as it reduces AppleEvent overhead to a O(1) bulk fetch.
 
+    const noContent = args.noContent === true;
     let filterSubject = subject ? subject.toLowerCase() : null;
     let filterSender = sender ? sender.toLowerCase() : null;
     let filterDateAfter = dateAfter ? new Date(dateAfter) : null;
@@ -190,7 +191,38 @@ function run(argv) {
       const subsetIndices = matchingIndices.slice(0, maxProcess);
       const subsetMsgs = subsetIndices.map((idx) => msgs[idx]);
 
-      for (let i = 0; i < maxProcess; i++) {
+      if (noContent) {
+        // FAST PATH: build results from bulk property arrays only. Zero per-message
+        // AppleEvents, so limit=1000 costs the same as limit=5. No body is fetched.
+        const bIds = msgs.id();
+        const bSubjects = subjects || msgs.subject();
+        const bSenders = senders || msgs.sender();
+        const bDatesReceived = datesReceived || msgs.dateReceived();
+        const bDatesSent = msgs.dateSent();
+        const bRead = readStatuses || msgs.readStatus();
+        const bFlagged = flaggedStatuses || msgs.flaggedStatus();
+        const bSizes = msgs.messageSize();
+        const iso = (d) => { try { return d ? d.toISOString() : null; } catch (e) { return null; } };
+        for (let k = 0; k < subsetIndices.length; k++) {
+          const idx = subsetIndices[k];
+          resultMessages.push({
+            id: bIds[idx],
+            subject: bSubjects[idx],
+            sender: bSenders[idx],
+            date_received: iso(bDatesReceived[idx]),
+            date_sent: iso(bDatesSent[idx]),
+            read_status: bRead[idx],
+            flagged_status: bFlagged[idx],
+            message_size: bSizes[idx],
+            content_length: null,
+            content_preview: null,
+            mailbox_path: mailboxPath,
+            account: accountName,
+          });
+        }
+      }
+
+      for (let i = 0; !noContent && i < maxProcess; i++) {
         const msg = subsetMsgs[i];
 
         // 1. Get content safely (often fails on weird/syncing messages)

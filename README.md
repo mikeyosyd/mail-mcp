@@ -583,6 +583,7 @@ Finds messages in a mailbox using efficient bulk array property fetching. Suppor
 - `dateAfter` (string, optional): Filter for messages received after this ISO date (e.g., "2024-01-01T00:00:00Z")
 - `dateBefore` (string, optional): Filter for messages received before this ISO date (e.g., "2024-12-31T23:59:59Z")
 - `limit` (integer, optional): Maximum number of messages to return (1-1000, default: 50)
+- `noContent` (boolean, optional): Skip fetching message bodies. `content_preview` and `content_length` come back null, and the call costs the same at `limit: 1000` as at `limit: 5`. Use it for sender censuses and for selecting IDs to pass to `move_messages` / `delete_messages` / `save_attachment`. Without it, each returned message costs one body fetch, so large limits can take minutes.
 
 **Note:** While all filter parameters are individually optional, you must provide at least one filter criterion. The tool will return an error if no filters are specified.
 

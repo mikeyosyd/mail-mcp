@@ -23,6 +23,7 @@ type FindMessagesInput struct {
 	FlaggedOnly bool     `json:"flaggedOnly,omitempty" jsonschema:"Filter for flagged messages only" long:"flagged-only" description:"Filter for flagged messages only"`
 	DateAfter   string   `json:"dateAfter,omitempty" jsonschema:"Filter for messages received after this ISO date (e.g., '2024-01-01T00:00:00Z')" long:"date-after" description:"Filter for messages received after this ISO date (e.g., '2024-01-01T00:00:00Z')"`
 	DateBefore  string   `json:"dateBefore,omitempty" jsonschema:"Filter for messages received before this ISO date (e.g., '2024-12-31T23:59:59Z')" long:"date-before" description:"Filter for messages received before this ISO date (e.g., '2024-12-31T23:59:59Z')"`
+	NoContent   bool     `json:"noContent,omitempty" jsonschema:"If true, skip fetching message bodies: content_preview and content_length are null and large limits return in seconds. Use for censuses and bulk selection." long:"no-content" description:"Skip fetching message bodies (fast; content fields are null)"`
 	Limit       int      `json:"limit,omitempty" jsonschema:"Maximum number of messages to return (1-1000, default: 50)" long:"limit" description:"Maximum number of messages to return (1-1000, default: 50)"`
 }
 
