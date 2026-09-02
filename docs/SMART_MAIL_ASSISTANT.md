@@ -232,6 +232,17 @@ One line per action, including dry runs, so the weekly digest can be generated a
 
 Each workflow is a short, idempotent script the driver runs. They share the brain and the rails.
 
+### 0. The scripts behind the workflows
+
+The brain repository carries small Python drivers that call the server through its CLI (`mail-mcp tool ...`), one Mail call at a time, and write the audit log and digests:
+
+| Script | Does | Acts? |
+|---|---|---|
+| `tools/dryrun.py` | Evaluates every class live (read/flag aware) and writes the day's digest | never |
+| `tools/apply.py --class X --yes` | Enables one class for real. Refuses unless the class has `dry_run: false` in `rules.yaml` *and* `--yes` is given *and* the deployed binary has the tools needed; snapshots the brain first; creates the target mailbox for `file` actions; batches of 500; audited | only when all gates pass |
+| `tools/rescue.py` | Junk rescue candidates (allow-listed senders in the Junk mailboxes) | only with `--apply --yes` |
+| `tools/sweep.py` | Collects everything new for a saga's `participants:`, **in both directions** (INBOX by sender, Sent by recipient), into `sagas/inbox/` for the assistant to fold into the saga and person files | never (writes a log, bumps `last_swept`) |
+
 ### 1. Tidy
 
 Runs daily. For each `class` in `rules.yaml`: `find_messages` by sender (and subject where given) → remove anything matching `people` or `red_lines` → apply the class action with `dryRun` unless the class is enabled → append to the audit log. Bulk tools are capped at 500 IDs per call, so large backlogs are paged.
@@ -270,7 +281,7 @@ Part of Tidy. Classes with `action: file` move records into their folders; class
 
 ## Tooling: what exists and what is needed
 
-`mail-mcp` today (this fork) provides fifteen tools. The assistant uses them as follows.
+`mail-mcp` today (this fork) provides seventeen tools. The assistant uses them as follows.
 
 | Need | Tool | Status |
 |---|---|---|
@@ -281,6 +292,7 @@ Part of Tidy. Classes with `action: file` move records into their folders; class
 | File messages | `move_messages` | exists (this fork) |
 | Trash messages | `delete_messages` | exists (this fork) |
 | **Save an attachment to disk** | `save_attachment` | **needed.** `get_message_content` returns only name, size and downloaded state. Mail's scripting dictionary exposes saving an attachment to a path; same pattern as the bulk tools. Blocks records harvesting. |
+| Create a folder for a filing rule | `create_mailbox` | exists (this fork). Idempotent; `dryRun` reports `exists` / `would_create`. Note: Mail refuses *scripted deletion* of a freshly created IMAP mailbox, so there is deliberately no `delete_mailbox`. |
 | **Mark read / unread, flag / unflag** | `set_message_flags` | **needed.** Cheap property setters on fields the scripts already read. Lets the digest mark what it has surfaced. |
 | **Sender census** | `count_messages` (group by sender) | **useful.** Today a census requires reading the on-disk `.emlx` store directly, which is fast but bypasses the server and is not portable. A grouped count over the same bulk property fetch would keep everything behind the API. |
 | List-Unsubscribe extraction | header access in `get_message_content` | **useful.** `allHeaders` is already returned; the assistant can parse `List-Unsubscribe` from it today. A dedicated field would be tidier. |
