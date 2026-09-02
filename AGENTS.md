@@ -8,6 +8,7 @@ Always refer to these documents for specific subsystem details:
 - **JXA & Mail Interaction:** [`docs/JXA_QUICK_REFERENCE.md`](docs/JXA_QUICK_REFERENCE.md) and [`docs/MAIL_EDITING.md`](docs/MAIL_EDITING.md)
 - **Nested Mailbox Support:** [`internal/tools/scripts/NESTED_MAILBOX_SUPPORT.md`](internal/tools/scripts/NESTED_MAILBOX_SUPPORT.md)
 - **Launchd Management:** [`docs/LAUNCHD_SERVICE_MANAGEMENT.md`](docs/LAUNCHD_SERVICE_MANAGEMENT.md)
+- **Assistant design (this fork):** [`docs/SMART_MAIL_ASSISTANT.md`](docs/SMART_MAIL_ASSISTANT.md)
 
 ## Project Overview & Architecture
 
