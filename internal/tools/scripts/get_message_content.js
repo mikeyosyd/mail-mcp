@@ -337,6 +337,18 @@ function run(argv) {
           attInfo.downloaded = false;
         }
 
+        try {
+          attInfo.id = att.id();
+        } catch (e) {
+          attInfo.id = null;
+        }
+
+        try {
+          attInfo.mimeType = att.mimeType();
+        } catch (e) {
+          attInfo.mimeType = null;
+        }
+
         result.attachments.push(attInfo);
       }
     } catch (e) {
