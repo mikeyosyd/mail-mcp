@@ -121,8 +121,13 @@ people:                         # the allow-list. Never auto-filed, never trashe
   - name: "[Sibling]"
     addresses: ["sibling@example.org"]
     memory: people/sibling.md
+    retain: forever           # never trashed, expired or moved by any rule
+    display_names: ["[Sibling Fullname]"]   # also protect mail whose From display name matches, whatever the address
 
 domains_allow: ["employer.example", "family-domain.example"]
+
+retention:
+  family_forever: true          # nothing from anyone in `people` is ever trashed or expired, by any rule
 
 red_lines:                      # checked before every action
   never_trash_from: ["*@bank.example", "*@lawyer.example"]
@@ -178,6 +183,9 @@ Semantics worth being precise about:
 - `keep_latest` trashes older messages **from that sender only**, and never anything unread.
 - `trash_after_days` measures from `date_received`.
 - `file` moves; it never trashes, even if the target already holds a duplicate.
+- `red_lines.never_trash_from` blocks **trash** actions only. It never blocks a `file` action: a pharmacy or bank that is on the never-trash list can still be filed into its records folder.
+- `people` entries match on address, and on `display_names` against the From header, so a family member writing from a new address is still protected.
+- `decisions:` is an append-only log of what the owner approved and when; it is documentation, not configuration.
 - A message that matches a `people` entry or a `red_lines` rule is removed from consideration **before** classes are evaluated.
 - A class with `dry_run: true` writes to the audit log with `"dry_run": true` and changes nothing.
 
@@ -284,6 +292,7 @@ Part of Tidy. Classes with `action: file` move records into their folders; class
 - **Rebuilding the binary invalidates the Accessibility grant.** The drafting tools then fail with a permission error until the stale entry is removed in System Settings, the tool is re-run to trigger a new prompt, and the launchd service is restarted. See `docs/AUTOMATION_PERMISSIONS.md` and `docs/LAUNCHD_SERVICE_MANAGEMENT.md`.
 - **Draft IDs churn.** Mail auto-saves an open compose window every few seconds and each save is a new draft ID; a drafts listing taken while a window is open is stale within seconds. Identify drafts by subject and recipients, not by ID, and expect leftover auto-saves after `replace_reply`.
 - **JXA `log()` output** only reaches the service log at debug level. Run with debug logging when diagnosing a slow search.
+- **Use `noContent: true` for any census or bulk selection.** Without it `find_messages` fetches every returned message's body (one AppleEvent each), so a sender with a few hundred matches can take minutes; with it a 1000-message result returns in seconds and the IDs go straight to `move_messages`, `delete_messages` or `save_attachment`.
 
 ## Rollout: capturing preferences safely
 
