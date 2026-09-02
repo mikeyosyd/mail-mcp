@@ -39,6 +39,8 @@ A Model Context Protocol (MCP) server providing programmatic access to macOS Mai
   - [get_message_content](#get_message_content)
   - [get_selected_messages](#get_selected_messages)
   - [find_messages](#find_messages)
+  - [move_messages](#move_messages)
+  - [delete_messages](#delete_messages)
   - [list_drafts](#list_drafts)
   - [create_reply_draft](#create_reply_draft)
   - [replace_reply_draft](#replace_reply_draft)
@@ -661,6 +663,66 @@ Find all messages with specific subject in nested mailbox:
   "limit": 100
 }
 ```
+
+### move_messages
+
+Moves messages by ID from one mailbox to another within the same account. Obtain IDs with `find_messages` first. Each message is one AppleEvent round trip, so calls are capped at 500 IDs; page through larger sets.
+
+**Parameters:**
+
+- `account` (string, required): Name of the email account
+- `mailboxPath` (array of strings, required): Source mailbox path (e.g., `["INBOX"]`)
+- `targetMailboxPath` (array of strings, required): Destination mailbox path (e.g., `["Archive", "2026"]`)
+- `messageIds` (array of integers, required): Message IDs to move (1-500)
+- `dryRun` (boolean, optional): Resolve mailboxes and look up every ID, but move nothing (default: false)
+
+**Output:**
+
+```json
+{
+  "dry_run": false,
+  "account": "iCloud",
+  "source_mailbox_path": ["INBOX"],
+  "target_mailbox_path": ["Archive"],
+  "requested": 3,
+  "moved": [{ "id": 402579, "subject": "Ciudad Patricia", "sender": "Jenny <j@example.com>" }],
+  "would_move": [],
+  "not_found": [999999],
+  "failed": [],
+  "message": "1 of 3 message(s) moved."
+}
+```
+
+IDs that are not found in the source mailbox are reported in `not_found` rather than failing the whole call. With `dryRun: true` the same lookups run and matches are returned in `would_move` instead.
+
+### delete_messages
+
+Deletes messages by ID. Mail.app moves deleted messages to the account's Trash (Deleted Messages); they are not permanently removed until the Trash is emptied. Obtain IDs with `find_messages` first. Capped at 500 IDs per call.
+
+**Parameters:**
+
+- `account` (string, required): Name of the email account
+- `mailboxPath` (array of strings, required): Mailbox containing the messages (e.g., `["INBOX"]`)
+- `messageIds` (array of integers, required): Message IDs to delete (1-500)
+- `dryRun` (boolean, optional): Look up every ID but delete nothing (default: false)
+
+**Output:**
+
+```json
+{
+  "dry_run": true,
+  "account": "iCloud",
+  "mailbox_path": ["INBOX"],
+  "requested": 2,
+  "deleted": [],
+  "would_delete": [{ "id": 401648, "subject": "Fw: Contract", "sender": "Jenny <j@example.com>" }],
+  "not_found": [],
+  "failed": [],
+  "message": "Dry run: 1 of 2 message(s) would be moved to Trash."
+}
+```
+
+**Recommended workflow for bulk clean-ups:** `find_messages` (filter by sender) → `delete_messages` with `dryRun: true` → review → `delete_messages`.
 
 ### list_drafts
 

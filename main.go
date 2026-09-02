@@ -279,6 +279,16 @@ func registerToolHandlers() {
 		return handleResult(data, err)
 	}
 
+	opts.GlobalOpts.Tool.MoveMessages.Handler = func(input tools.MoveMessagesInput) error {
+		_, data, err := tools.HandleMoveMessages(context.Background(), nil, input)
+		return handleResult(data, err)
+	}
+
+	opts.GlobalOpts.Tool.DeleteMessages.Handler = func(input tools.DeleteMessagesInput) error {
+		_, data, err := tools.HandleDeleteMessages(context.Background(), nil, input)
+		return handleResult(data, err)
+	}
+
 	opts.GlobalOpts.Tool.CreateOutgoingMessage.Handler = func(input tools.CreateOutgoingMessageInput) error {
 		_, data, err := tools.HandleCreateOutgoingMessage(context.Background(), nil, input)
 		return handleResult(data, err)
