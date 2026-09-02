@@ -355,6 +355,8 @@ macOS requires both **Automation** and **Accessibility** permissions for full fu
 
 ### Accessibility Permissions
 
+**Running under another application (STDIO transport):** when a client such as Claude Desktop / Cowork or a terminal launches `mail-mcp` as a child process, macOS attributes the Accessibility permission to *that application*, not to `mail-mcp`. Grant Accessibility to the launching app (for example `Claude`) and quit and reopen it. Restarting the launchd service has no effect on a stdio child; the server's error message names the launching application when it can determine it.
+
 The draft creation and replacement tools (`create_reply_draft`, `replace_reply_draft`, `create_outgoing_message`, `replace_outgoing_message`) use the macOS Accessibility API to simulate pasting content.
 This is the only reliable way to support rich text (Markdown) while preserving original message quotes and signatures.
 If you only want to use tools that read emails, you can skip granting the accessibility permission.
