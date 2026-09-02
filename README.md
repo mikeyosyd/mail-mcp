@@ -888,6 +888,8 @@ rm -r ~/Library/Logs/com.github.dastrobu.mail-mcp/
 
 All JXA scripts are embedded at compile time using `//go:embed`, making the server a single, self-contained binary.
 
+Design notes for an assistant built on top of these tools (tidy, per-person memory, morning drafts, cross-Mac operation) are in [`docs/SMART_MAIL_ASSISTANT.md`](docs/SMART_MAIL_ASSISTANT.md).
+
 ## Development
 
 ### Build
