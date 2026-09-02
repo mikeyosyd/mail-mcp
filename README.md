@@ -42,6 +42,7 @@ A Model Context Protocol (MCP) server providing programmatic access to macOS Mai
   - [move_messages](#move_messages)
   - [delete_messages](#delete_messages)
   - [save_attachment](#save_attachment)
+  - [create_mailbox](#create_mailbox)
   - [list_drafts](#list_drafts)
   - [create_reply_draft](#create_reply_draft)
   - [replace_reply_draft](#replace_reply_draft)
@@ -761,6 +762,24 @@ Saves a message's attachments to a directory on disk. By default every attachmen
 ```
 
 Attachment names are sanitised (path separators replaced) so a name can never write outside `directory`. `get_message_content` now also returns each attachment's `id` and `mimeType`.
+
+### create_mailbox
+
+Creates a mailbox (folder) in an account, optionally nested under an existing mailbox. Idempotent: if the mailbox already exists the tool reports `exists` and changes nothing.
+
+**Parameters:**
+
+- `account` (string, required): Name of the email account
+- `mailboxPath` (array of strings, required): Path to create. The last element is the new mailbox name; preceding elements are the parent path and must exist (e.g. `["Travel"]`, `["WineGeex", "Receipts"]`). Names are case-sensitive.
+- `dryRun` (boolean, optional): Report `exists` / `would_create` without creating (default: false)
+
+**Output:**
+
+```json
+{ "dry_run": false, "account": "iCloud", "mailbox_path": ["Travel"], "parent_path": [], "status": "created", "verified": true, "message": "Mailbox \"Travel\" created." }
+```
+
+`status` is one of `created`, `exists`, `would_create`. On IMAP accounts the new mailbox appears on the server after Mail syncs it.
 
 ### list_drafts
 

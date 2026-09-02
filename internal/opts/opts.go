@@ -127,6 +127,7 @@ type ToolCmd struct {
 	MoveMessages           MoveMessagesCmd           `command:"move_messages" description:"Moves messages by ID to another mailbox"`
 	DeleteMessages         DeleteMessagesCmd         `command:"delete_messages" description:"Deletes messages by ID (moves to Trash)"`
 	SaveAttachment         SaveAttachmentCmd         `command:"save_attachment" description:"Saves a message attachments to a directory"`
+	CreateMailbox          CreateMailboxCmd          `command:"create_mailbox" description:"Creates a mailbox (folder), optionally nested"`
 }
 
 // ListAccountsCmd represents the 'tool list_accounts' command
@@ -382,6 +383,20 @@ type SaveAttachmentCmd struct {
 func (c *SaveAttachmentCmd) Execute(args []string) error {
 	if c.Handler != nil {
 		return c.Handler(c.SaveAttachmentInput)
+	}
+	return nil
+}
+
+// CreateMailboxCmd represents the 'tool create_mailbox' command
+type CreateMailboxCmd struct {
+	tools.CreateMailboxInput
+	Handler func(tools.CreateMailboxInput) error
+}
+
+// Execute runs the create_mailbox tool command
+func (c *CreateMailboxCmd) Execute(args []string) error {
+	if c.Handler != nil {
+		return c.Handler(c.CreateMailboxInput)
 	}
 	return nil
 }
