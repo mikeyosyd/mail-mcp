@@ -289,6 +289,11 @@ func registerToolHandlers() {
 		return handleResult(data, err)
 	}
 
+	opts.GlobalOpts.Tool.SaveAttachment.Handler = func(input tools.SaveAttachmentInput) error {
+		_, data, err := tools.HandleSaveAttachment(context.Background(), nil, input)
+		return handleResult(data, err)
+	}
+
 	opts.GlobalOpts.Tool.CreateOutgoingMessage.Handler = func(input tools.CreateOutgoingMessageInput) error {
 		_, data, err := tools.HandleCreateOutgoingMessage(context.Background(), nil, input)
 		return handleResult(data, err)

@@ -41,6 +41,7 @@ A Model Context Protocol (MCP) server providing programmatic access to macOS Mai
   - [find_messages](#find_messages)
   - [move_messages](#move_messages)
   - [delete_messages](#delete_messages)
+  - [save_attachment](#save_attachment)
   - [list_drafts](#list_drafts)
   - [create_reply_draft](#create_reply_draft)
   - [replace_reply_draft](#replace_reply_draft)
@@ -723,6 +724,40 @@ Deletes messages by ID. Mail.app moves deleted messages to the account's Trash (
 ```
 
 **Recommended workflow for bulk clean-ups:** `find_messages` (filter by sender) → `delete_messages` with `dryRun: true` → review → `delete_messages`.
+
+### save_attachment
+
+Saves a message's attachments to a directory on disk. By default every attachment on the message is saved; `attachmentId` (from `get_message_content`) or `attachmentName` selects one. Files that already exist are skipped unless `overwrite` is set. Attachments Mail.app has not yet downloaded cannot be saved and are reported as skipped.
+
+**Parameters:**
+
+- `account` (string, required): Name of the email account
+- `mailboxPath` (array of strings, required): Mailbox containing the message (e.g., `["INBOX"]`)
+- `messageId` (integer, required): Message ID
+- `directory` (string, required): Absolute path, or `~/...`. Created if missing.
+- `attachmentId` (string, optional): Save only this attachment
+- `attachmentName` (string, optional): Save only the attachment with this exact name
+- `overwrite` (boolean, optional): Overwrite existing files (default: false)
+- `dryRun` (boolean, optional): Report without writing (default: false)
+
+**Output:**
+
+```json
+{
+  "dry_run": false,
+  "message_id": 402709,
+  "subject": "Re: Contract",
+  "directory": "/Users/me/Documents/Contracts",
+  "attachment_count": 2,
+  "saved": [{ "id": "...", "name": "contract.pdf", "mimeType": "application/pdf", "fileSize": 106849, "downloaded": true, "path": "/Users/me/Documents/Contracts/contract.pdf" }],
+  "would_save": [],
+  "skipped": [{ "name": "image.png", "reason": "exists", "path": "..." }],
+  "failed": [],
+  "message": "1 attachment(s) saved to /Users/me/Documents/Contracts."
+}
+```
+
+Attachment names are sanitised (path separators replaced) so a name can never write outside `directory`. `get_message_content` now also returns each attachment's `id` and `mimeType`.
 
 ### list_drafts
 

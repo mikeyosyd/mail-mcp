@@ -126,6 +126,7 @@ type ToolCmd struct {
 	FindMessages           FindMessagesCmd           `command:"find_messages" description:"Find messages in a mailbox"`
 	MoveMessages           MoveMessagesCmd           `command:"move_messages" description:"Moves messages by ID to another mailbox"`
 	DeleteMessages         DeleteMessagesCmd         `command:"delete_messages" description:"Deletes messages by ID (moves to Trash)"`
+	SaveAttachment         SaveAttachmentCmd         `command:"save_attachment" description:"Saves a message attachments to a directory"`
 }
 
 // ListAccountsCmd represents the 'tool list_accounts' command
@@ -367,6 +368,20 @@ type DeleteMessagesCmd struct {
 func (c *DeleteMessagesCmd) Execute(args []string) error {
 	if c.Handler != nil {
 		return c.Handler(c.DeleteMessagesInput)
+	}
+	return nil
+}
+
+// SaveAttachmentCmd represents the 'tool save_attachment' command
+type SaveAttachmentCmd struct {
+	tools.SaveAttachmentInput
+	Handler func(tools.SaveAttachmentInput) error
+}
+
+// Execute runs the save_attachment tool command
+func (c *SaveAttachmentCmd) Execute(args []string) error {
+	if c.Handler != nil {
+		return c.Handler(c.SaveAttachmentInput)
 	}
 	return nil
 }

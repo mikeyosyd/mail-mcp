@@ -26,4 +26,7 @@ func RegisterAll(srv *mcp.Server) {
 	// Bulk message management tools
 	RegisterMoveMessages(srv)
 	RegisterDeleteMessages(srv)
+
+	// Attachment tools
+	RegisterSaveAttachment(srv)
 }
